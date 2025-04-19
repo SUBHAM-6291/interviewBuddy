@@ -1,20 +1,159 @@
 import React from "react";
 
-const Logo: React.FC = () => (
-  <svg className="w-12 h-12 mb-6" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="50" cy="50" r="45" stroke="url(#grad)" strokeWidth="6" fill="none" />
-    <path
-      d="M50 20C35 20 25 35 25 50C25 65 35 80 50 80C65 80 75 65 75 50C75 35 65 20 50 20ZM50 60C45 60 40 55 40 50C40 45 45 40 50 40C55 40 60 45 60 50C60 55 55 60 50 60Z"
-      fill="url(#grad)"
-    />
-    <path d="M45 30L55 50L45 70" stroke="url(#grad)" strokeWidth="6" strokeLinecap="round" />
+const DynamicRunningLogo: React.FC = () => (
+  <svg
+    className="w-16 h-16"
+    viewBox="0 0 160 160"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <style>
+      {`
+        .pulse-core {
+          animation: pulseCore 2s infinite ease-in-out;
+        }
+        .orbit-ring-fast {
+          animation: orbitRingFast 15s linear infinite;
+          transform-origin: 80px 80px; /* Center of SVG (160/2) */
+        }
+        .orbit-ring-slow {
+          animation: orbitRingSlow 20s linear infinite reverse;
+          transform-origin: 80px 80px; /* Center of SVG */
+        }
+        .core-spin {
+          animation: coreSpin 10s linear infinite;
+          transform-origin: 80px 80px; /* Center of SVG */
+        }
+        .particle-flow {
+          animation: particleFlow 3s infinite ease-in-out;
+        }
+        .holo-glow {
+          animation: holoGlow 2.5s infinite alternate ease-in-out;
+        }
+        @keyframes pulseCore {
+          0%, 100% { transform: scale(1); opacity: 0.9; }
+          50% { transform: scale(1.1); opacity: 1; }
+        }
+        @keyframes orbitRingFast {
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes orbitRingSlow {
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes coreSpin {
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes particleFlow {
+          0%, 100% { transform: translateY(0); opacity: 0.6; }
+          50% { transform: translateY(-5px); opacity: 1; }
+        }
+        @keyframes holoGlow {
+          0% { stop-opacity: 0.4; }
+          100% { stop-opacity: 0.8; }
+        }
+      `}
+    </style>
+    {/* Holographic Background Glow */}
+    <circle cx="80" cy="80" r="78" fill="url(#holoGrad)" className="pulse-core" />
+    {/* Orbiting Rings (Dynamic Motion) */}
+    <g className="orbit-ring-fast">
+      <circle
+        cx="80"
+        cy="80"
+        r="74"
+        stroke="url(#orbitGrad)"
+        strokeWidth="2"
+        fill="none"
+        strokeDasharray="10,5"
+      />
+    </g>
+    <g className="orbit-ring-slow">
+      <circle
+        cx="80"
+        cy="80"
+        r="70"
+        stroke="url(#orbitGrad)"
+        strokeWidth="1.5"
+        fill="none"
+        strokeDasharray="5,8"
+      />
+    </g>
+    {/* Core Circle (Foundation) */}
+    <circle cx="80" cy="80" r="64" fill="#0F172A" />
+    {/* Central AI Core (Interconnected Spheres) */}
+    <g className="core-spin">
+      {/* Central Sphere */}
+      <circle cx="80" cy="80" r="20" fill="url(#coreGrad)" className="holo-glow" />
+      {/* Surrounding Smaller Spheres (Communication Nodes) */}
+      <circle cx="80" cy="60" r="8" fill="url(#nodeGrad)" className="particle-flow" />
+      <circle cx="80" cy="100" r="8" fill="url(#nodeGrad)" className="particle-flow" />
+      <circle cx="60" cy="80" r="8" fill="url(#nodeGrad)" className="particle-flow" />
+      <circle cx="100" cy="80" r="8" fill="url(#nodeGrad)" className="particle-flow" />
+      {/* Connecting Lines (AI Network) */}
+      <path
+        d="M80 60L80 80M80 100L80 80M60 80L80 80M100 80L80 80"
+        stroke="#FFFFFF"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeOpacity="0.7"
+      />
+      {/* Subtle Data Arcs */}
+      <path
+        d="M70 70C75 65 85 65 90 70"
+        stroke="url(#arcGrad)"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d="M70 90C75 95 85 95 90 90"
+        stroke="url(#arcGrad)"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+      />
+    </g>
+    {/* Floating Data Particles (Running Effect) */}
+    <circle cx="50" cy="40" r="3" fill="#38BDF8" className="particle-flow" style={{ animationDelay: "0s" }} />
+    <circle cx="110" cy="40" r="3" fill="#38BDF8" className="particle-flow" style={{ animationDelay: "0.5s" }} />
+    <circle cx="80" cy="120" r="3" fill="#38BDF8" className="particle-flow" style={{ animationDelay: "1s" }} />
+    <circle cx="40" cy="80" r="2.5" fill="#A5B4FC" className="particle-flow" style={{ animationDelay: "1.5s" }} />
+    <circle cx="120" cy="80" r="2.5" fill="#A5B4FC" className="particle-flow" style={{ animationDelay: "2s" }} />
+    {/* Inner Glow Overlay */}
+    <circle cx="80" cy="80" r="62" fill="url(#innerGlowGrad)" fillOpacity="0.3" />
     <defs>
-      <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" style={{ stopColor: '#00E7FF', stopOpacity: 1 }} />
-        <stop offset="100%" style={{ stopColor: '#0066CC', stopOpacity: 1 }} />
+      {/* Holographic Background Gradient */}
+      <radialGradient id="holoGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style={{ stopColor: "#38BDF8", stopOpacity: 0.8 }} className="holo-glow" />
+        <stop offset="100%" style={{ stopColor: "#1E3A8A", stopOpacity: 0 }} />
+      </radialGradient>
+      {/* Orbit Ring Gradient */}
+      <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{ stopColor: "#38BDF8", stopOpacity: 0.9 }} />
+        <stop offset="100%" style={{ stopColor: "#A78BFA", stopOpacity: 0.9 }} />
       </linearGradient>
+      {/* Central Core Gradient */}
+      <linearGradient id="coreGrad" x1="70" y1="70" x2="90" y2="90">
+        <stop offset="0%" style={{ stopColor: "#FFFFFF", stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: "#38BDF8", stopOpacity: 1 }} />
+      </linearGradient>
+      {/* Node Gradient */}
+      <linearGradient id="nodeGrad" x1="60" y1="60" x2="100" y2="100">
+        <stop offset="0%" style={{ stopColor: "#A5B4FC", stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: "#38BDF8", stopOpacity: 1 }} />
+      </linearGradient>
+      {/* Arc Gradient */}
+      <linearGradient id="arcGrad" x1="70" y1="70" x2="90" y2="90">
+        <stop offset="0%" style={{ stopColor: "#FFFFFF", stopOpacity: 0.7 }} />
+        <stop offset="100%" style={{ stopColor: "#A5B4FC", stopOpacity: 0.7 }} />
+      </linearGradient>
+      {/* Inner Glow Gradient */}
+      <radialGradient id="innerGlowGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" style={{ stopColor: "#FFFFFF", stopOpacity: 0.6 }} />
+        <stop offset="100%" style={{ stopColor: "#1E3A8A", stopOpacity: 0 }} />
+      </radialGradient>
     </defs>
   </svg>
 );
 
-export default Logo;
+export default DynamicRunningLogo;

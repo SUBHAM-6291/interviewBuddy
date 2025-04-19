@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
-import { signUpSchema } from "@/zod/form.zod";
+import { signUpSchema } from "@/backend/zod/form.zod";
 import { SignUpFormData, UserTypes } from "@/backend/types/form.types";
 import { useState } from "react";
 import CameraModal from "@/components/authform/camera";
@@ -289,17 +289,7 @@ const SignUpForm: React.FC<{
           </div>
         </div>
         <div className="h-16 bg-white/5 backdrop-blur-lg flex items-center justify-around border-t border-white/10 shadow-sm">
-          <NavButton icon="M15 19l-7-7 7-7" route="/auth" label="Back" />
-          <NavButton
-            icon="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"
-            route="/"
-            label="Home"
-          />
-          <NavButton
-            icon="M12 12m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0"
-            route="/profile"
-            label="Profile"
-          />
+      
         </div>
       </div>
     </div>
