@@ -137,7 +137,7 @@ const SignInForm: React.FC = () => {
               </button>
               <p className="text-center text-sm text-white/70 mt-4">
                 New user?{" "}
-                <Link href="/auth/sign-up" className="text-teal-500 hover:text-teal-600 underline">
+                <Link href="/sign-up" className="text-teal-500 hover:text-teal-600 underline">
                   Sign Up
                 </Link>
               </p>
