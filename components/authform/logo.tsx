@@ -53,9 +53,7 @@ const DynamicRunningLogo: React.FC = () => (
         }
       `}
     </style>
-    {/* Holographic Background Glow */}
     <circle cx="80" cy="80" r="78" fill="url(#holoGrad)" className="pulse-core" />
-    {/* Orbiting Rings (Dynamic Motion) */}
     <g className="orbit-ring-fast">
       <circle
         cx="80"
@@ -78,18 +76,13 @@ const DynamicRunningLogo: React.FC = () => (
         strokeDasharray="5,8"
       />
     </g>
-    {/* Core Circle (Foundation) */}
     <circle cx="80" cy="80" r="64" fill="#0F172A" />
-    {/* Central AI Core (Interconnected Spheres) */}
     <g className="core-spin">
-      {/* Central Sphere */}
       <circle cx="80" cy="80" r="20" fill="url(#coreGrad)" className="holo-glow" />
-      {/* Surrounding Smaller Spheres (Communication Nodes) */}
       <circle cx="80" cy="60" r="8" fill="url(#nodeGrad)" className="particle-flow" />
       <circle cx="80" cy="100" r="8" fill="url(#nodeGrad)" className="particle-flow" />
       <circle cx="60" cy="80" r="8" fill="url(#nodeGrad)" className="particle-flow" />
       <circle cx="100" cy="80" r="8" fill="url(#nodeGrad)" className="particle-flow" />
-      {/* Connecting Lines (AI Network) */}
       <path
         d="M80 60L80 80M80 100L80 80M60 80L80 80M100 80L80 80"
         stroke="#FFFFFF"
@@ -97,7 +90,6 @@ const DynamicRunningLogo: React.FC = () => (
         strokeLinecap="round"
         strokeOpacity="0.7"
       />
-      {/* Subtle Data Arcs */}
       <path
         d="M70 70C75 65 85 65 90 70"
         stroke="url(#arcGrad)"
@@ -113,41 +105,33 @@ const DynamicRunningLogo: React.FC = () => (
         strokeLinecap="round"
       />
     </g>
-    {/* Floating Data Particles (Running Effect) */}
     <circle cx="50" cy="40" r="3" fill="#38BDF8" className="particle-flow" style={{ animationDelay: "0s" }} />
     <circle cx="110" cy="40" r="3" fill="#38BDF8" className="particle-flow" style={{ animationDelay: "0.5s" }} />
     <circle cx="80" cy="120" r="3" fill="#38BDF8" className="particle-flow" style={{ animationDelay: "1s" }} />
     <circle cx="40" cy="80" r="2.5" fill="#A5B4FC" className="particle-flow" style={{ animationDelay: "1.5s" }} />
     <circle cx="120" cy="80" r="2.5" fill="#A5B4FC" className="particle-flow" style={{ animationDelay: "2s" }} />
-    {/* Inner Glow Overlay */}
     <circle cx="80" cy="80" r="62" fill="url(#innerGlowGrad)" fillOpacity="0.3" />
     <defs>
-      {/* Holographic Background Gradient */}
       <radialGradient id="holoGrad" cx="50%" cy="50%" r="50%">
         <stop offset="0%" style={{ stopColor: "#38BDF8", stopOpacity: 0.8 }} className="holo-glow" />
         <stop offset="100%" style={{ stopColor: "#1E3A8A", stopOpacity: 0 }} />
       </radialGradient>
-      {/* Orbit Ring Gradient */}
       <linearGradient id="orbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" style={{ stopColor: "#38BDF8", stopOpacity: 0.9 }} />
         <stop offset="100%" style={{ stopColor: "#A78BFA", stopOpacity: 0.9 }} />
       </linearGradient>
-      {/* Central Core Gradient */}
       <linearGradient id="coreGrad" x1="70" y1="70" x2="90" y2="90">
         <stop offset="0%" style={{ stopColor: "#FFFFFF", stopOpacity: 1 }} />
         <stop offset="100%" style={{ stopColor: "#38BDF8", stopOpacity: 1 }} />
       </linearGradient>
-      {/* Node Gradient */}
       <linearGradient id="nodeGrad" x1="60" y1="60" x2="100" y2="100">
         <stop offset="0%" style={{ stopColor: "#A5B4FC", stopOpacity: 1 }} />
         <stop offset="100%" style={{ stopColor: "#38BDF8", stopOpacity: 1 }} />
       </linearGradient>
-      {/* Arc Gradient */}
       <linearGradient id="arcGrad" x1="70" y1="70" x2="90" y2="90">
         <stop offset="0%" style={{ stopColor: "#FFFFFF", stopOpacity: 0.7 }} />
         <stop offset="100%" style={{ stopColor: "#A5B4FC", stopOpacity: 0.7 }} />
       </linearGradient>
-      {/* Inner Glow Gradient */}
       <radialGradient id="innerGlowGrad" cx="50%" cy="50%" r="50%">
         <stop offset="0%" style={{ stopColor: "#FFFFFF", stopOpacity: 0.6 }} />
         <stop offset="100%" style={{ stopColor: "#1E3A8A", stopOpacity: 0 }} />

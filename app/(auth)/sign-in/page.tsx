@@ -9,30 +9,6 @@ import { SignInFormData } from "@/backend/types/form.types";
 import { useState } from "react";
 import Logo from "@/components/authform/logo";
 
-interface NavButtonProps {
-  icon: string;
-  route: string;
-  label: string;
-}
-
-const NavButton: React.FC<NavButtonProps> = ({ icon, route, label }) => {
-  const router = useRouter();
-  return (
-    <div className="relative flex flex-col items-center">
-      <button
-        onClick={() => router.push(route)}
-        className="w-10 h-10 flex items-center justify-center bg-white/10 backdrop-blur-lg rounded-xl hover:bg-white/20 transition-all duration-300"
-        aria-label={`Navigate to ${label}`}
-      >
-        <svg className="w-5 h-5 stroke-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={icon} />
-        </svg>
-      </button>
-      <span className="absolute bottom-[-16px] text-xs text-white/70 truncate w-12 text-center">{label}</span>
-    </div>
-  );
-};
-
 const SignInForm: React.FC = () => {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,7 +26,7 @@ const SignInForm: React.FC = () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
-      console.log("Sign-in Data:", data);
+     
       router.push("/dashboard");
     } finally {
       setIsSubmitting(false);
