@@ -1,8 +1,12 @@
 import React from "react";
 
-const DynamicRunningLogo: React.FC = () => (
+type DynamicRunningLogoProps = {
+  className?: string;
+};
+
+const DynamicRunningLogo: React.FC<DynamicRunningLogoProps> = ({ className }) => (
   <svg
-    className="w-16 h-16"
+    className={`w-16 h-16 ${className || ""}`}
     viewBox="0 0 160 160"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

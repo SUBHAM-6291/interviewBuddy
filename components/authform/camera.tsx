@@ -1,4 +1,4 @@
-"use client";
+/*"use client";
 
 import { useState, useEffect, useRef } from "react";
 
@@ -153,4 +153,4 @@ const CameraModal: React.FC<CameraModalProps> = ({ onCapture, onClose }) => {
   );
 };
 
-export default CameraModal;
+export default CameraModal;*/

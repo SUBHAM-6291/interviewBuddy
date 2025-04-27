@@ -1,101 +1,85 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
+import { prepSections } from "@/components/dashboard_route/data/prepSections";
+import { studentFeedbacks } from "@/components/dashboard_route/data/studentFeedbacks";
+import PrepCard from "@/components/dashboard_route/PrepCard";
+import FeedbackTicker from "@/components/dashboard_route/FeedbackTicker";
+import DynamicRunningLogo from "@/components/authform/logo";
+import { memo } from "react";
 
-const quotes = {
-  Mentor: "‘Practice makes perfect—every mock interview builds your confidence.’ – Inspired by mentorship",
-  Coach: "‘Feedback is your ladder to success in interviews.’ – Inspired by coaching wisdom",
-  Candidates: "‘Together, we conquer interview challenges daily.’ – Inspired by candidate growth",
-} as const;
-
-const roles = ["Mentor", "Coach", "Candidates"] as const;
-type Role = typeof roles[number];
-
-const interviewImage ="https://media.istockphoto.com/id/2193065392/photo/young-business-professionals-collaborating-in-a-modern-meeting-room.webp?s=1024x1024&w=is&k=20&c=kEERak83iER3k1MUxHZyJKC_Vrdl7YSjh6Y80KWupbg=";
+const MemoizedPrepCard = memo(PrepCard);
 
 export default function InterviewBuddySection() {
-  const [activeRole, setActiveRole] = useState("Mentor");
-
-  const handleClick = (role: Role) => setActiveRole(role);
-
   return (
-    <section className="bg-gray-900 text-white py-20">
+    <section
+      className="relative bg-black text-white py-24 overflow-hidden"
+      aria-label="Interview Buddy Preparation Section"
+    >
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(0deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px] opacity-10" />
+      </div>
+
       <div className="container mx-auto px-6 max-w-7xl">
-        <div className="mb-16 text-center">
-          <h1 className="text-5xl font-extrabold tracking-tight mb-3">
-            Interview Buddy Dashboard
-          </h1>
-          <p className="text-gray-400 text-lg">
-            Your go-to platform for mastering mock interviews and acing your career goals
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <div className="flex flex-col gap-4">
-              {roles.map((role) => (
-                <button
-                  key={role}
-                  onClick={() => handleClick(role)}
-                  className={`block w-full py-3 px-6 text-left rounded-lg font-semibold transition-all duration-300 ${
-                    activeRole === role
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                      : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
-                  }`}
-                  aria-label={`Select ${role} details`}
-                >
-                  {role}
-                </button>
-              ))}
-            </div>
-
-            <div className="bg-gray-800 p-6 rounded-xl space-y-4 border border-gray-700">
-              {activeRole === "Mentor" && (
-                <>
-                  <h2 className="text-3xl font-bold text-white">Alex Carter</h2>
-                  <p className="text-blue-400 font-medium">Interview Mentor</p>
-                  <p className="text-gray-300">Guides you to interview success</p>
-                  <p className="text-gray-500 italic text-sm">{quotes.Mentor}</p>
-                </>
-              )}
-              {activeRole === "Coach" && (
-                <>
-                  <h2 className="text-3xl font-bold text-white">Sarah Lee</h2>
-                  <p className="text-blue-400 font-medium">Interview Coach</p>
-                  <p className="text-gray-300">Provides actionable feedback</p>
-                  <p className="text-gray-500 italic text-sm">{quotes.Coach}</p>
-                </>
-              )}
-              {activeRole === "Candidates" && (
-                <>
-                  <h2 className="text-3xl font-bold text-white">Our Learners</h2>
-                  <p className="text-blue-400 font-medium">Interview Candidates</p>
-                  <p className="text-gray-300">The future stars of the workforce</p>
-                  <p className="text-gray-500 italic text-sm">{quotes.Candidates}</p>
-                </>
-              )}
-            </div>
-
-            <div className="text-center">
-              <p className="text-blue-400 text-lg font-semibold italic">
-                "Unlock Your Potential with Every Practice Session"
-              </p>
+        <div className="text-center mb-20 relative animate-fade-in">
+          <div className="flex justify-center mb-8 relative">
+            <div className="p-3 bg-black border border-platinum-200/30 rounded-lg shadow-[inset_0_0_8px_rgba(229,231,235,0.2)]">
+              <DynamicRunningLogo
+                className="h-16 w-auto drop-shadow-[0_0_6px_rgba(255,255,255,0.15)]"
+              />
             </div>
           </div>
+          <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-4 text-white font-serif">
+            Interview Buddy
+          </h1>
+          <p className="text-gray-200 text-lg md:text-xl max-w-2xl mx-auto font-sans">
+            Elevate your career with expertly crafted interview preparation.
+          </p>
+          <div className="mt-6 h-0.5 w-24 bg-platinum-200 mx-auto" />
+        </div>
 
-          <div className="relative h-[500px] rounded-2xl overflow-hidden shadow-2xl">
-            <Image
-              src={interviewImage}
-              alt="Mock interview preparation"
-              fill
-              style={{ objectFit: "cover" }}
-              className="transition-transform duration-500 hover:scale-105"
-              priority
-            />
+        <div className="mb-20">
+          <h2 className="text-4xl font-bold text-center mb-12 text-white font-serif animate-fade-in">
+            Client Success Stories
+          </h2>
+          <FeedbackTicker feedbacks={studentFeedbacks} />
+        </div>
+
+        <div>
+          <h2 className="text-4xl font-bold text-center mb-12 text-white font-serif animate-fade-in">
+            Tailored Preparation Programs
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {prepSections.map((section, index) => (
+              <MemoizedPrepCard
+                key={section.id}
+                section={section}
+                index={index}
+              />
+            ))}
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        section {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        h1, h2, h3 {
+          font-family: 'Merriweather', serif;
+        }
+        .animate-fade-in {
+          animation: fadeIn 1s ease-out forwards;
+        }
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .animate-fade-in {
+            animation: none;
+          }
+        }
+      `}</style>
     </section>
   );
 }

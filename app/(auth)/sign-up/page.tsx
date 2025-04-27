@@ -11,7 +11,7 @@ import Logo from '@/components/authform/logo';
 import { toast } from 'sonner';
 import { auth } from '@/backend/firebase/client';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { signup } from '@/lib/actions/auth.actions';
+import { signup } from '@/lib/actions/auth/signup.actions';
 
 const SignUpForm: React.FC = () => {
   const router = useRouter();
