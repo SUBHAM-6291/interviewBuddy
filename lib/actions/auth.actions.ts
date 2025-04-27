@@ -1,132 +1,84 @@
-"use server";
+'use server';
 
-import { auth, db } from "@/backend/firebase/admin";
-import { cookies } from "next/headers";
-import { SignInInput, SignUpInput,AppUser } from "@/backend/types/form.types";
+import { adminAuth, adminDb } from '@/backend/firebase/admin';
+import { SignupParams, SignInParams } from '@/backend/types/form.types';
+import validator from 'validator';
 
+// Signup action
+export async function signup(params: SignupParams) {
+  const { uid, email, fullName } = params;
 
-
-const SESSION_DURATION = 60 * 60 * 24 * 7;
-
-export async function setSessionCookie(idToken: string) {
-  const cookieStore = await cookies();
-
-  const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: SESSION_DURATION * 1000,
-  });
-
-  cookieStore.set("session", sessionCookie, {
-    maxAge: SESSION_DURATION,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    sameSite: "lax",
-  });
-}
-
-export async function signUp(params: SignUpInput) {
-  const { fullName, email, password } = params;
+  // Validate inputs
+  if (!uid || !email || !fullName) {
+    return { success: false, message: 'UID, email, and full name are required.' };
+  }
+  if (!validator.isEmail(email)) {
+    return { success: false, message: 'Invalid email format.' };
+  }
+  if (!/^[a-zA-Z0-9_-]{28}$/.test(uid)) {
+    return { success: false, message: 'Invalid UID format.' };
+  }
 
   try {
-    const userRecord = await auth.createUser({
-      email,
-      password,
-    });
+    const userRef = adminDb.collection('users').doc(uid);
+    const userRecord = await userRef.get();
 
-    const id = userRecord.uid;
-
-    const userDoc = await db.collection("users").doc(id).get();
-    if (userDoc.exists) {
-      return {
-        success: false,
-        message: "User already exists. Please sign in.",
-      };
+    if (userRecord.exists) {
+      return { success: false, message: 'User already exists.' };
     }
 
-    await db.collection("users").doc(id).set({
+    await userRef.set({
       fullName,
       email,
+      createdAt: new Date().toISOString(),
     });
 
-    return {
-      success: true,
-      message: "Account created successfully. Please sign in.",
-    };
+    return { success: true, message: 'User created successfully.' };
   } catch (error: any) {
-    console.error("Error creating user:", error);
-
-    if (error.code === "auth/email-already-exists") {
-      return {
-        success: false,
-        message: "This email is already in use",
-      };
+    console.error('Error creating user:', error);
+    if (error.code === 'firestore/permission-denied') {
+      return { success: false, message: 'Permission denied when accessing database.' };
     }
-
-    return {
-      success: false,
-      message: "Failed to create account. Please try again.",
-    };
+    return { success: false, message: `Failed to create user: ${error.message}` };
   }
 }
 
-export async function signIn(params: SignInInput) {
+// SignIn action
+export async function signIn(params: SignInParams) {
   const { email, idToken } = params;
 
+  // Validate inputs
+  if (!email || !idToken) {
+    return { success: false, message: 'Email and ID token are required.' };
+  }
+
   try {
-    const userRecord = await auth.getUserByEmail(email);
-    if (!userRecord) {
-      return {
-        success: false,
-        message: "User does not exist. Create an account.",
-      };
+    // Verify ID token
+    const decodedToken = await adminAuth.verifyIdToken(idToken);
+    if (decodedToken.email !== email) {
+      return { success: false, message: 'Email does not match ID token.' };
     }
 
-    await setSessionCookie(idToken);
-    return {
-      success: true,
-      message: "Signed in successfully",
-    };
+    // Check if user exists in Firestore
+    const userRef = adminDb.collection('users').doc(decodedToken.uid);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return { success: false, message: 'User not found in database.' };
+    }
+
+    return { success: true, message: 'pass' };
   } catch (error: any) {
-    console.error("Sign-in error:", error);
-    return {
-      success: false,
-      message: "Failed to log into account. Please try again.",
-    };
+    console.error('Error signing in:', error);
+    switch (error.code) {
+      case 'auth/invalid-id-token':
+        return { success: false, message: 'Invalid ID token.' };
+      case 'auth/user-not-found':
+        return { success: false, message: 'No user found with this email.' };
+      case 'auth/invalid-email':
+        return { success: false, message: 'Invalid email format.' };
+      default:
+        return { success: false, message: `Failed to sign in: ${error.message}` };
+    }
   }
-}
-
-export async function signOut() {
-  const cookieStore = await cookies();
-  cookieStore.delete("session");
-}
-
-export async function getCurrentUser(): Promise<AppUser | null> {
-  const cookieStore = await cookies();
-
-  const sessionCookie = cookieStore.get("session")?.value;
-  if (!sessionCookie) return null;
-
-  try {
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-
-    const userRecord = await db.collection("users").doc(decodedClaims.uid).get();
-    if (!userRecord.exists) return null;
-
-    const userData = userRecord.data();
-    if (!userData?.fullName || !userData?.email) return null;
-
-    return {
-      fullName: userData.fullName,
-      email: userData.email,
-      id: decodedClaims.uid,
-    };
-  } catch (error) {
-    console.error("Error verifying session:", error);
-    return null;
-  }
-}
-
-export async function isAuthenticated() {
-  const user = await getCurrentUser();
-  return !!user;
 }

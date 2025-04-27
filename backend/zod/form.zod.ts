@@ -1,18 +1,19 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const signUpSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 8 characters"),
+  fullName: z.string().min(1, 'Full name is required'),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 export const signInSchema = z.object({
-  email: z.string().email("Invalid email format"),
-  idToken: z.string().min(6, "ID token is required"),
+  email: z.string().email('Invalid email format'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 export const appUserSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  email: z.string().email("Invalid email format"),
-  id: z.string().min(1, "ID is required"),
+  id: z.string().regex(/^[a-zA-Z0-9_-]{28}$/, 'Invalid user ID format'),
+  fullName: z.string().min(1, 'Full name is required'),
+  email: z.string().email('Invalid email format'),
+  createdAt: z.string().optional(),
 });
