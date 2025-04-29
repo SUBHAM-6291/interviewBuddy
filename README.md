@@ -57,7 +57,7 @@ Want to help? 😊
 MIT License (see LICENSE file)
 
 ## Contact
-Email: your-email@example.com
-GitHub: Open an issue at https://github.com/your-username/interviewbuddy/issues
+Email: subhamsingh39621@gmail.com
+GitHub: Open an issue at https://github.com/SUBHAM-6291/interviewbuddy/issues
 
 Ace your interviews with InterviewBuddy! 💼
