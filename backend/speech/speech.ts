@@ -2,7 +2,7 @@ import { toast } from 'react-toastify';
 
 export const speakText = (text: string, onEnd?: () => void) => {
   if (!('speechSynthesis' in window)) {
-    toast.error('Text-to-speech is not supported in this browser.');
+    toast.error('Yeh browser bol nahi sakta.');
     return;
   }
 

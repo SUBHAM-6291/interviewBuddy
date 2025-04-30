@@ -16,7 +16,7 @@ const schema = z.object({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log('Request body:', body); // Debug log
+    console.log('Request body:', body);
     const { success, data, error } = schema.safeParse(body);
     if (!success) {
       return NextResponse.json({ success: false, error: error.message }, { status: 400 });
@@ -24,7 +24,6 @@ export async function POST(request: Request) {
 
     const { type, role, level, techstack, amount, userid } = data;
 
-    // Validate role and techstack alignment
     const roleTechstackMap: { [key: string]: string[] } = {
       'Frontend Engineer': ['React', 'JavaScript', 'HTML', 'CSS'],
       'Data Scientist': ['Python', 'pandas', 'scikit-learn'],
@@ -46,7 +45,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // Generate MCQs using Gemini
     const { text } = await generateText({
       model: google('gemini-1.5-flash'),
       prompt: `
@@ -74,11 +72,11 @@ export async function POST(request: Request) {
       `,
     });
 
-    // Clean markdown from response
+ 
     const cleanedText = text.replace(/```json\n|\n```/g, '').trim();
     console.log('Cleaned Gemini response:', cleanedText);
 
-    // Parse and validate Gemini response
+   
     let questions;
     try {
       questions = JSON.parse(cleanedText);
@@ -107,7 +105,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Store in Firestore
     if (!adminDb) {
       throw new Error('Firestore is not initialized');
     }

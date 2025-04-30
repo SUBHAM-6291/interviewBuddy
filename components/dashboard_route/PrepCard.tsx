@@ -8,6 +8,12 @@ interface PrepCardProps {
   index: number;
 }
 
+interface PrepCardProps {
+  section: PrepSection;
+  index: number;
+  onSpeak?: () => void; // Add onSpeak prop
+}
+
 export default function PrepCard({ section, index }: PrepCardProps) {
   return (
     <Card

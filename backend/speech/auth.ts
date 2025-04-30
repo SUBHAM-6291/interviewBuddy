@@ -11,7 +11,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (!auth) {
-      toast.error('Authentication service is unavailable.');
+      toast.error('Login system nahi chal raha.');
       router.push('/sign-up');
       return;
     }

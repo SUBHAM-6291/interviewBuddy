@@ -34,26 +34,10 @@ interface InterviewParams {
   amount: string;
 }
 
-const positiveFeedback = [
-  'Excellent work! You answered correctly.',
-  'Well done! Your response is accurate.',
-  'Great job! Youre on the right track.',
-  'Correct! Keep up the strong performance.',
-  'Nicely done! Your answer is spot on.',
-];
-
-const negativeFeedback = [
-  'Incorrect. Please review and try again.',
-  'Not quite. Consider revisiting this topic.',
-  'That’s not correct. Keep practicing!',
-  'Missed it this time. Study this area further.',
-  'Incorrect answer. Try again next time.',
-];
-
 const AIInterviewQuizPage: React.FC = () => {
   const router = useRouter();
-  const { slug } = useParams();
-  const category = Array.isArray(slug) ? slug[0]?.toLowerCase() : (slug || 'software').toLowerCase();
+  const params = useParams();
+  const category = typeof params.slug === 'string' ? params.slug.toLowerCase() : 'software';
 
   const { userId, userName } = useAuth();
   const [gameStatus, setGameStatus] = useState<GameStatus>(GameStatus.INACTIVE);
@@ -65,17 +49,15 @@ const AIInterviewQuizPage: React.FC = () => {
 
   const selectedSection = prepSections.find((section) => section.id === category) || prepSections[0];
 
-  const getInitialParams = (): InterviewParams => {
-    return {
-      type: 'technical',
-      role: selectedSection.title.replace(' Interview Prep', ''),
-      level: 'mid',
-      techstack: selectedSection.description
-        .split(' ')[selectedSection.description.split(' ').length - 3]
-        .replace(',', ''),
-      amount: '10',
-    };
-  };
+  const getInitialParams = (): InterviewParams => ({
+    type: 'technical',
+    role: selectedSection.title.replace(' Interview Prep', ''),
+    level: 'mid',
+    techstack: selectedSection.description
+      .split(' ')
+      [selectedSection.description.split(' ').length - 3]?.replace(',', '') || 'JavaScript',
+    amount: '10',
+  });
 
   const [interviewParams, setInterviewParams] = useState<InterviewParams>(getInitialParams());
 
@@ -127,13 +109,8 @@ const AIInterviewQuizPage: React.FC = () => {
     if (gameStatus === GameStatus.ACTIVE) {
       setGameStatus(GameStatus.FINISHED);
       setTimeLeft(0);
-      const percentage = (score / questions.length) * 100;
-      const feedback =
-        percentage >= 80
-          ? 'Excellent performance! You’ve mastered this quiz.'
-          : 'Good effort! Continue practicing to improve.';
-      speakText(`Quiz completed. Your score is ${score} out of ${questions.length}. ${feedback}`);
-      toast.info(`Score: ${score}/${questions.length}. ${feedback}`);
+      speakText(`Quiz completed. Your score is ${score} out of ${questions.length}.`);
+      toast.info(`Score: ${score}/${questions.length}`);
       setTimeout(() => {
         stopSpeech();
         router.push('/dashboard');
@@ -147,15 +124,20 @@ const AIInterviewQuizPage: React.FC = () => {
           amount: parseInt(interviewParams.amount, 10),
           userid: userId,
         };
-        const questions = await fetchQuizQuestions(payload);
-        setQuestions(questions);
+        const fetchedQuestions = await fetchQuizQuestions(payload);
+        if (!fetchedQuestions || fetchedQuestions.length === 0) {
+          throw new Error('No questions received from the server.');
+        }
+        setQuestions(fetchedQuestions);
         setGameStatus(GameStatus.ACTIVE);
         setTimeLeft(30);
         speakText(
-          `Welcome, ${userName}. Your quiz on ${selectedSection.title} is starting now. Here is your first question: ${questions[0].question}`
+          `Welcome, ${userName}. Your quiz on ${selectedSection.title} is starting now. Here is your first question: ${fetchedQuestions[0].question}`
         );
       } catch (error) {
         setGameStatus(GameStatus.INACTIVE);
+        toast.error('Failed to start quiz. Please try again.');
+        console.error('Error fetching questions:', error);
       }
     }
   };
@@ -163,12 +145,6 @@ const AIInterviewQuizPage: React.FC = () => {
   const handleAnswerSubmit = (answer: string | null) => {
     const currentQuestion = questions[currentQuestionIndex];
     const isCorrect = answer && answer.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
-    const feedback = isCorrect
-      ? positiveFeedback[Math.floor(Math.random() * positiveFeedback.length)]
-      : negativeFeedback[Math.floor(Math.random() * negativeFeedback.length)];
-
-    speakText(feedback);
-    toast[isCorrect ? 'success' : 'error'](feedback);
 
     if (isCorrect) {
       setScore((prev) => prev + 1);
@@ -182,13 +158,8 @@ const AIInterviewQuizPage: React.FC = () => {
     } else {
       setGameStatus(GameStatus.FINISHED);
       setTimeLeft(0);
-      const percentage = (score / questions.length) * 100;
-      const finalFeedback =
-        percentage >= 80
-          ? 'Excellent performance! You’ve mastered this quiz.'
-          : 'Good effort! Continue practicing to improve.';
-      speakText(`Quiz completed. Your score is ${score} out of ${questions.length}. ${finalFeedback}`);
-      toast.info(`Score: ${score}/${questions.length}. ${finalFeedback}`);
+      speakText(`Quiz completed. Your score is ${score} out of ${questions.length}.`);
+      toast.info(`Score: ${score}/${questions.length}`);
       setTimeout(() => {
         stopSpeech();
         router.push('/dashboard');
@@ -210,7 +181,9 @@ const AIInterviewQuizPage: React.FC = () => {
       setInterviewParams({
         ...interviewParams,
         role: section.title.replace(' Interview Prep', ''),
-        techstack: section.description.split(' ')[section.description.split(' ').length - 3].replace(',', ''),
+        techstack: section.description
+          .split(' ')
+          [section.description.split(' ').length - 3]?.replace(',', '') || 'JavaScript',
       });
     }
   };
@@ -228,11 +201,6 @@ const AIInterviewQuizPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <p className="text-lg">Your score: {score}/{questions.length}</p>
-            <p className="text-lg mt-2">
-              {score / questions.length >= 0.8
-                ? 'Excellent performance! You’ve mastered this quiz.'
-                : 'Good effort! Continue practicing to improve.'}
-            </p>
             <p className="text-sm mt-2">Redirecting to dashboard...</p>
           </CardContent>
         </Card>
@@ -298,7 +266,6 @@ const AIInterviewQuizPage: React.FC = () => {
                     <div>
                       <Label htmlFor="type">Question Type</Label>
                       <Select
-                        name="type"
                         value={interviewParams.type}
                         onValueChange={(value) => handleSelectChange('type', value)}
                       >
@@ -314,7 +281,6 @@ const AIInterviewQuizPage: React.FC = () => {
                     <div>
                       <Label htmlFor="level">Experience Level</Label>
                       <Select
-                        name="level"
                         value={interviewParams.level}
                         onValueChange={(value) => handleSelectChange('level', value)}
                       >
