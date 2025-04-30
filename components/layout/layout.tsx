@@ -44,7 +44,7 @@ const Page = () => {
               <span className="absolute left-0 bottom-[-8px] w-full h-1 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </div>
             <p className="text-lg sm:text-xl font-light leading-relaxed">
-              Master your interviews with AI-powered mock sessions and personalized feedback.
+            Ace your interviews with AI-powered MCQ practice and personalized feedback.
             </p>
             <Link href="/dashboard">
               <button className="mt-6 px-4 py-2 sm:px-6 sm:py-3 bg-transparent border-2 border-white text-white rounded-full font-medium text-base sm:text-lg hover:bg-white hover:text-black transition-all duration-300">
