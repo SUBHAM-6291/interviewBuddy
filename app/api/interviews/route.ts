@@ -14,9 +14,11 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  let body; // Store body outside to access in catch block
   try {
-    const body = await request.json();
+    body = await request.json();
     console.log('Request body:', body);
+
     const { success, data, error } = schema.safeParse(body);
     if (!success) {
       return NextResponse.json({ success: false, error: error.message }, { status: 400 });
@@ -24,12 +26,14 @@ export async function POST(request: Request) {
 
     const { type, role, level, techstack, amount, userid } = data;
 
+    // Role Validation Logic
     const roleTechstackMap: { [key: string]: string[] } = {
       'Frontend Engineer': ['React', 'JavaScript', 'HTML', 'CSS'],
       'Data Scientist': ['Python', 'pandas', 'scikit-learn'],
       'Cybersecurity Specialist': ['Network Security', 'Encryption', 'OWASP'],
       'Software Engineer': ['React', 'Node.js', 'Java', 'Python'],
     };
+
     const expectedTech = roleTechstackMap[role];
     if (expectedTech) {
       const techstackArray = techstack.split(',').map((t: string) => t.trim().toLowerCase());
@@ -45,69 +49,61 @@ export async function POST(request: Request) {
       }
     }
 
+    // AI Generation
     const { text } = await generateText({
-      model: google('gemini-1.5-flash'),
+      model: google('gemini-2.5-flash'), // Upgraded for better JSON performance
       prompt: `
         Generate exactly ${amount} ${type} multiple-choice questions for a job interview.
-        The job role is "${role}" (e.g., Cybersecurity Specialist, Frontend Engineer, Data Scientist).
-        The job experience level is "${level}" (junior, mid, or senior).
-        The tech stack is: "${techstack}" (e.g., Network Security, Encryption, OWASP for Cybersecurity Specialist; React, JavaScript, HTML, CSS for Frontend Engineer; Python, pandas, scikit-learn for Data Scientist).
-        Each question must have:
-        - Exactly four answer options.
-        - One correct answer and three incorrect distractors.
-        - Clear, concise wording suitable for a voice assistant (avoid symbols like *, /, or complex formatting).
-        Return the response as a valid JSON array, like this:
+        Role: ${role}, Level: ${level}, Tech Stack: ${techstack}.
+        
+        Requirements:
+        - Exactly 4 options per question.
+        - Exactly 1 correct answer that exists within the options array.
+        - No markdown formatting, no symbols like * or /, suitable for voice reading.
+        
+        Return ONLY a JSON array:
         [
           {
-            "question": "Question text",
-            "options": ["Option 1", "Option 2", "Option 3", "Option 4"],
-            "correctAnswer": "Option 1"
+            "question": "string",
+            "options": ["string", "string", "string", "string"],
+            "correctAnswer": "string"
           }
         ]
-        Rules:
-        - Output ONLY valid JSON. Do not include markdown (e.g., \`\`\`json), comments, or extra text.
-        - Use double quotes for all strings and escape special characters properly.
-        - Ensure questions are practical and relevant to the role and tech stack (e.g., OWASP, encryption for Cybersecurity Specialist; React, JavaScript for Frontend Engineer; machine learning, pandas for Data Scientist).
-        - Ensure exactly ${amount} questions, each with 4 options and 1 correct answer matching one of the options.
       `,
     });
 
- 
-    const cleanedText = text.replace(/```json\n|\n```/g, '').trim();
-    console.log('Cleaned Gemini response:', cleanedText);
-
-   
+    // Clean response (Gemini sometimes wraps in ```json blocks)
+    const cleanedText = text.replace(/```json|```/g, '').trim();
+    
     let questions;
     try {
       questions = JSON.parse(cleanedText);
-      if (
-        !Array.isArray(questions) ||
-        questions.length !== amount ||
-        questions.some(
-          (q) =>
-            !q.question ||
-            !q.options ||
-            !Array.isArray(q.options) ||
-            q.options.length !== 4 ||
-            !q.correctAnswer ||
-            !q.options.includes(q.correctAnswer)
-        )
-      ) {
-        throw new Error(
-          `Invalid question format: Must be an array of ${amount} questions, each with a question, 4 options, and a correctAnswer matching one option.`
-        );
-      }
+      
+      // Structural Validation
+      const isValid = Array.isArray(questions) && 
+                      questions.length === amount &&
+                      questions.every(q => 
+                        q.question && 
+                        Array.isArray(q.options) && 
+                        q.options.length === 4 && 
+                        q.options.includes(q.correctAnswer)
+                      );
+
+      if (!isValid) throw new Error("AI returned incorrect JSON structure");
+
     } catch (e) {
-      console.error('Error parsing Gemini response:', e, 'Cleaned text:', cleanedText);
+      console.error('Parsing Error:', e, 'Raw AI Text:', text);
       return NextResponse.json(
-        { success: false, error: 'Failed to generate valid questions from Gemini AI' },
+        { success: false, error: 'AI failed to generate a valid question format. Please try again.' },
         { status: 500 }
       );
     }
 
+    // Firestore Logic
     if (!adminDb) {
       throw new Error('Firestore is not initialized');
     }
+
     const interview = {
       role,
       type,
@@ -117,15 +113,26 @@ export async function POST(request: Request) {
       userId: userid,
       createdAt: new Date().toISOString(),
     };
+
     const docRef = await adminDb.collection('interviews').add(interview);
 
     return NextResponse.json({ success: true, interviewId: docRef.id, questions }, { status: 200 });
+
   } catch (error: any) {
-    console.error('Error in POST /api/interviews:', {
+    // Check if the error is specifically the API key
+    const isApiKeyError = error.message?.includes('API key');
+    
+    console.error('CRITICAL ERROR in POST /api/interviews:', {
       message: error.message,
-      stack: error.stack,
-      requestBody: await request.json().catch(() => 'Invalid JSON'),
+      requestBody: body, // Safe access to pre-parsed body
     });
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+
+    return NextResponse.json(
+      { 
+        success: false, 
+        error: isApiKeyError ? 'AI Configuration Error: Please check API Key' : error.message 
+      }, 
+      { status: 500 }
+    );
   }
 }
